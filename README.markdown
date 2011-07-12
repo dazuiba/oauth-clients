@@ -60,10 +60,9 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 
 3. define a routes to your own omini-auth controller\#action
   
-  <pre>  
+<pre>  
   #config/routes.rb
-  map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
-        
+  map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'        
   #app/controllers/session_controller.rb
   class SessionController  < ApplicationController
     def omniauth_callback
@@ -81,7 +80,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
        end
     end
   end
-  </pre>  
+</pre>  
     
 4. Send Messages to 3rd parties(QQ,Douban,tsina etc)
   
