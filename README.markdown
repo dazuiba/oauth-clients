@@ -20,7 +20,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 
 ## Example usage
 
-1.  Setting up a yml file(config/auth-clients.yml)
+1. Setting up a yml file(config/auth-clients.yml)
   
 		oauth:
 		  base:
@@ -46,7 +46,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 		    key: 
 		    secret: 
 
-2.  create a file with the folloing content(config/initializers/oauth-clients-initializer.rb)
+2. create a file with the folloing content(config/initializers/oauth-clients-initializer.rb)
 		
 		require 'oauth_clients'		
 		#setting up oauth clients
@@ -58,36 +58,36 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 		  ActionController::Dispatcher.middleware.use klass, provider.key, provider.secret, provider.options||{}
 		end
 
-3.  define a routes to your own omini-auth controller\#action
+3. define a routes to your own omini-auth controller\#action
     
-    #config/routes.rb
-    map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
+  #config/routes.rb
+  map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
         
-    #app/controllers/session_controller.rb
-    class SessionController  < ApplicationController
-       def omniauth_callback
-          if auth = request.env['omniauth.auth']
-            auth_info = {:provider    => params[:type],
-                       :credentials => {:token => auth["credentials"]["token"],:secret => auth["credentials"]["secret"],
-                       :user_info   => auth["user_info"] }
-            # save auth_info to database, example:
-            #  User.current.auth_info.create(auth_info)				
-            flash["notice"] = "绑定帐号成功!"
-          else
-            flash["error"] = "绑定帐号失败: 系统错误!"
-          end
-          redirect_to '/profile/third_party_service'
-    	end
-    end
+  #app/controllers/session_controller.rb
+  class SessionController  < ApplicationController
+    def omniauth_callback
+      if auth = request.env['omniauth.auth']
+         auth_info = {:provider    => params[:type],
+                     :credentials => {:token => auth["credentials"]["token"],:secret => auth["credentials"]["secret"],
+                     :user_info   => auth["user_info"] }
+         # save auth_info to database, example:
+         #  User.current.auth_info.create(auth_info)				
+         flash["notice"] = "绑定帐号成功!"
+       else
+         flash["error"] = "绑定帐号失败: 系统错误!"
+       end
+         redirect_to '/profile/third_party_service'
+       end
+  end
     
-4.  Send Messages to 3rd parties(QQ,Douban,tsina etc)
+4. Send Messages to 3rd parties(QQ,Douban,tsina etc)
   
   auth_info = User.current.auth_info	
   client = OAuthClients::Provider[auth_info.provider].client(JSON.parse(auth_info.data))
   client.say('hello','image_url' => YOUR_IMAGE_URL)
   
    
-5.  (optional) use resque or delyed_job, so that you can put #3 in to background
+5. Optional: use resque or delyed_job, so that you can put #3 in to background
   
   class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)  
     def self.create_and_perform(auth_info_id, message,image_url)
