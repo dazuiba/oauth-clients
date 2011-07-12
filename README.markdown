@@ -5,7 +5,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 
 ## 简介
 
-{omini-auth}[https://github.com/intridea/omniauth] 是用来获取用户在SNS网站上【授权】的一个Gem， 而oauth-clients就是要干接下来的事情。
+[omini-auth](https://github.com/intridea/omniauth) 是用来获取用户在SNS网站上【授权】的一个Gem， 而oauth-clients就是要干接下来的事情。
 
 接下来你需要:
 
@@ -60,7 +60,6 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 
 3.  define a routes to your own omini-auth controller\#action
     
-    <pre>
     #config/routes.rb
     map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
         
@@ -80,19 +79,16 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
           redirect_to '/profile/third_party_service'
     	end
     end
-    </pre>
     
 4.  Send Messages to 3rd parties(QQ,Douban,tsina etc)
   
-  <pre>
-	 auth_info = User.current.auth_info	
-	 client = OAuthClients::Provider[auth_info.provider].client(JSON.parse(auth_info.data))
-	 client.say('hello','image_url' => YOUR_IMAGE_URL)
-  </pre>
+  auth_info = User.current.auth_info	
+  client = OAuthClients::Provider[auth_info.provider].client(JSON.parse(auth_info.data))
+  client.say('hello','image_url' => YOUR_IMAGE_URL)
+  
    
 5.  (optional) use resque or delyed_job, so that you can put #3 in to background
   
-  <pre>
   class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)  
     def self.create_and_perform(auth_info_id, message,image_url)
       Delayed::Job.enqueue new(auth_info_id, message,image_url)
@@ -109,14 +105,13 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
       end
     end
   end
-  </pre>
   
 Usage:
 
 In your controller:
-  <pre>  
-    SyncMessageTo3rdPartiesJob.create_and_perform(User.current.auth_info, message, image_url)
-  </pre>
+ 
+  SyncMessageTo3rdPartiesJob.create_and_perform(User.current.auth_info, message, image_url)
+
 ##TODO
 
 * 用sinatra写一个简单的demo
