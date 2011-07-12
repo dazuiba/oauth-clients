@@ -16,7 +16,10 @@
  2. 支持附图功能（目前只支持t.sina)
 
 == Example usage
-0. Setting up a yml file, put it into config/auth-clients.yml
+
+0. Setting up a yml file
+
+   #config/auth-clients.yml
 		oauth:
 		  base:
 		    realm: http://YOUR_WEBSITE_ROOT
@@ -42,7 +45,9 @@
 		    secret: 
 
 1. create a file with the folloing content, add put it in config/initializers/
-
+		
+		#config/initializers/oauth-clients-initializer.rb
+		
 		require 'oauth_clients'
 		
 		#setting up oauth clients
@@ -55,31 +60,28 @@
 		end
 
 2. define a routes to your own omini-auth controller#action
-
+   
+   #config/routes.rb
 	 map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
-	
+	  
+	 #app/controllers/session_controller.rb
 	 class SessionController  < ApplicationController
-			def omniauth_callback
-				  if auth = request.env['omniauth.auth']
-		        auth_info = {:provider    => params[:type],
-														  :credentials => {:token => auth["credentials"]["token"],:secret => auth["credentials"]["secret"],
-															:user_info   => auth["user_info"] }
+       def omniauth_callback
+          if auth = request.env['omniauth.auth']
+            auth_info = {:provider    => params[:type],
+                       :credentials => {:token => auth["credentials"]["token"],:secret => auth["credentials"]["secret"],
+                       :user_info   => auth["user_info"] }
+            # save auth_info to database, example:
+            #  User.current.auth_info.create(auth_info)
 						
-						# 
-						# save auth_info to database
-						# your own code here!
-						# example:
-						#  User.current.auth_info.create(auth_info)
-						#
-						
-		        flash["notice"] = "绑定帐号成功!"
-		      else
-		        flash["error"] = "绑定帐号失败: 系统错误!"
-		      end
-		      redirect_to '/profile/third_party_service'
-			end
-	 end
-	
+            flash["notice"] = "绑定帐号成功!"
+          else
+            flash["error"] = "绑定帐号失败: 系统错误!"
+          end
+          redirect_to '/profile/third_party_service'
+    	end
+    end
+
 3. Send Messages to 3rd parties(QQ,Douban,tsina etc)
 	 
 	 auth_info = User.current.auth_info
@@ -89,7 +91,8 @@
 
 4. (optional) use resque or delyed_job, so that you can put #3 in to background
 
-	class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)
+  class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)
+  
     def self.create_and_perform(auth_info_id, message,image_url)
       Delayed::Job.enqueue new(auth_info_id, message,image_url)
     end
@@ -110,6 +113,12 @@
 
   Usage:
 
-	In your controller:
-	
+  In your controller:
+
   	SyncMessageTo3rdPartiesJob.create_and_perform(User.current.auth_info, message, image_url)
+
+
+== TODO
+
+1. 用sinatra写一个简单的demo
+2. 制作一个Gem 发布到rubygems.org上
