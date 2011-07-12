@@ -1,6 +1,9 @@
-= oauth-clients
+oauth-clients
+================
 
-这是一个发送消息(图片)到第三方服务的插件。 基于omini-auth。
+A simple to use plugin for sync messages(or images) from your website to SNS website (tsina,tqq,douban etc)。 based on omini-auth。
+
+## 简介
 
 {omini-auth}[https://github.com/intridea/omniauth] 是用来获取用户在SNS网站上【授权】的一个Gem， 而oauth-clients就是要干接下来的事情。
 
@@ -9,17 +12,16 @@
 1. 将第三方网站的credentials保存起来
 2. 当用户在你网站上操作时， 他(她)希望在后台自动将这个操作同步到自己的SNS网站上。
 
-== 功能
+## 功能
 
- 1. 支持网站 t.sina,t.qq,  douban, renren
+1. 支持网站 t.sina,t.qq,  douban, renren
 	 如果没有你想要的，你也可以自己去 oauth-clients/lib/clients.rb增加
- 2. 支持附图功能（目前只支持t.sina)
+2. 支持附图功能（目前只支持t.sina)
 
-== Example usage
+## Example usage
 
-0. Setting up a yml file
-
-   #config/auth-clients.yml
+0. Setting up a yml file(config/auth-clients.yml)
+  
 		oauth:
 		  base:
 		    realm: http://YOUR_WEBSITE_ROOT
@@ -44,9 +46,7 @@
 		    key: 
 		    secret: 
 
-1. create a file with the folloing content, add put it in config/initializers/
-		
-		#config/initializers/oauth-clients-initializer.rb
+1. create a file with the folloing content(config/initializers/oauth-clients-initializer.rb)
 		
 		require 'oauth_clients'
 		
@@ -61,10 +61,13 @@
 
 2. define a routes to your own omini-auth controller#action
    
-   #config/routes.rb
+   config/routes.rb
+   <pre>
 	 map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
-	  
-	 #app/controllers/session_controller.rb
+	 </pre>
+	 
+	 app/controllers/session_controller.rb
+	 <pre>
 	 class SessionController  < ApplicationController
        def omniauth_callback
           if auth = request.env['omniauth.auth']
@@ -81,16 +84,16 @@
           redirect_to '/profile/third_party_service'
     	end
     end
+    </pre>
 
 3. Send Messages to 3rd parties(QQ,Douban,tsina etc)
-	 
-	 auth_info = User.current.auth_info
-	
+	 <pre>
+	 auth_info = User.current.auth_info	
 	 client = OAuthClients::Provider[auth_info.provider].client(JSON.parse(auth_info.data))
 	 client.say('hello','image_url' => YOUR_IMAGE_URL)
-
+   </pre>
 4. (optional) use resque or delyed_job, so that you can put #3 in to background
-
+  <pre>
   class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)
   
     def self.create_and_perform(auth_info_id, message,image_url)
@@ -109,16 +112,16 @@
       end
     end
   end
-
+  </pre>
 
   Usage:
 
   In your controller:
+  <pre>
+    	SyncMessageTo3rdPartiesJob.create_and_perform(User.current.auth_info, message, image_url)
+  </pre>
 
-  	SyncMessageTo3rdPartiesJob.create_and_perform(User.current.auth_info, message, image_url)
-
-
-== TODO
+##TODO
 
 1. 用sinatra写一个简单的demo
 2. 制作一个Gem 发布到rubygems.org上
