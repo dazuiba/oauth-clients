@@ -59,7 +59,8 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
 		end
 
 3. define a routes to your own omini-auth controller\#action
-    
+  
+  <pre>  
   #config/routes.rb
   map.connect '/auth/:type/callback', :controller => 'session', :action => 'omniauth_callback'
         
@@ -78,7 +79,9 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
        end
          redirect_to '/profile/third_party_service'
        end
+    end
   end
+  </pre>  
     
 4. Send Messages to 3rd parties(QQ,Douban,tsina etc)
   
@@ -89,6 +92,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
    
 5. Optional: use resque or delyed_job, so that you can put #3 in to background
   
+<pre>
   class SyncMessageTo3rdPartiesJob < Struct.new(:auth_info_id,:message,:image_url)  
     def self.create_and_perform(auth_info_id, message,image_url)
       Delayed::Job.enqueue new(auth_info_id, message,image_url)
@@ -105,7 +109,7 @@ A simple to use plugin for sync messages(or images) from your website to SNS web
       end
     end
   end
-  
+</pre> 
 Usage:
 
 In your controller:
